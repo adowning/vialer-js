@@ -118,6 +118,10 @@ class ModuleSettings extends Module {
                     },
                 },
             },
+            wizard: {
+                completed: false,
+                step: 0,
+            },
         }
     }
 
@@ -131,7 +135,11 @@ class ModuleSettings extends Module {
     * disabled.
     */
     _ready() {
-        if (this.app.state.settings.vault.unlocked && this.app.state.settings.webrtc.media.permission) {
+        const vaultUnlocked = this.app.state.settings.vault.unlocked
+        const mediaPermission = this.app.state.settings.webrtc.media.permission
+        const isAuthenticated = this.app.state.user.authenticated
+
+        if (vaultUnlocked && mediaPermission && isAuthenticated) {
             this.queryMediaDevices()
         }
     }
