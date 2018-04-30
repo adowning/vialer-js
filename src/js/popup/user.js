@@ -17,11 +17,15 @@ class UserModule {
         _$.passwordInput = $('#password')
 
         const login = () => {
+            const password = _$.passwordInput.val()
+            const username = _$.emailInput.val().trim()
+
             // Login when form is not empty.
-            if (_$.emailInput.val().trim().length && _$.passwordInput.val().length) {
+            if (password.length && username.length) {
+
                 this.app.emit('user:login.attempt', {
-                    password: _$.passwordInput.val(),
-                    username: _$.emailInput.val().trim(),
+                    password,
+                    username,
                 })
             }
         }
@@ -89,6 +93,13 @@ class UserModule {
                     return true
                 }
             })
+        })
+
+        /**
+        * Show an error on login fail.
+        */
+        this.app.on('user:login.twoFactorMandatory', (data) => {
+            this.app.modules.ui.showTwoFactorView()
         })
 
         /**

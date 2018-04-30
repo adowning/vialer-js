@@ -312,6 +312,13 @@ class UiModule {
         this._$.allViews.addClass('hide').filter('.view-login').removeClass('hide')
     }
 
+    /**
+    * Shows the login view for unauthenticated users.
+    */
+    showTwoFactorView() {
+        this._$.allViews.addClass('hide').filter('.view-two-factor').removeClass('hide')
+    }
+
 
     /**
     * Shows the telemetry consent view.
