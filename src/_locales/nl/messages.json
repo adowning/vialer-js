@@ -40,7 +40,7 @@
         "description": "Weer te geven tekst bij een mislukte inlogpoging."
     },
     "twoFactorErrorText": {
-        "message": "Fout, controleer 2fa code",
+        "message": "verkeerde 2fa code",
         "description": "Weer te geven tekst bij een mislukte inlogpoging met 2fa."
     },
     "loginFormLogoutText": {

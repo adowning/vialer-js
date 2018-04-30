@@ -129,6 +129,7 @@ class UserModule {
         * Show an error on login fail in case a two factor token is needed.
         */
         this.app.on('user:login.twoFactorMandatory', (data) => {
+            this.app.modules.ui.setButtonState(_$.twoFactorButton, 'default', true, 0)
             this.app.modules.ui.showTwoFactorView()
             _$.twoFactorInput.focus()
         })
@@ -137,6 +138,7 @@ class UserModule {
         * Show an error on two factor login fail.
         */
         this.app.on('user:twoFactorLogin.failed', () => {
+            this.app.store.remove('twoFactorToken');
             this.app.modules.ui.setButtonState(_$.twoFactorButton, 'error', true, 0)
         })
 

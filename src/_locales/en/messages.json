@@ -40,8 +40,8 @@
         "description": "Text to show after a failed login attempt."
     },
     "twoFactorErrorText": {
-        "message": "Error, please check platform settings",
-        "description": "Text to show after a failed login attempt."
+        "message": "Wrong 2fa code",
+        "description": "Text to show after a failed login attempt with 2fa."
     },
     "loginFormLogoutText": {
         "message": "Logged out",
