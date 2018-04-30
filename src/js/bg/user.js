@@ -98,7 +98,6 @@ class UserModule {
                 return this.app.api.client.get('api/permission/systemuser/profile/')
             })
             .then(({data, status}) => {
-                console.log(data, status)
                 if (this.app.api.OK_STATUS.includes(status)) {
                     this.clearTemporaryData()
                     if (!data.client) {
