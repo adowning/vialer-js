@@ -15,6 +15,8 @@ class UserModule {
         _$.emailInput = $('#username')
         _$.loginButton = $('.login-button')
         _$.passwordInput = $('#password')
+        _$.twoFactorInput = $('#twofactor')
+        _$.twoFactorButton = $('.two-factor-button')
 
         const login = () => {
             const password = _$.passwordInput.val()
@@ -28,6 +30,14 @@ class UserModule {
                     username,
                 })
             }
+        }
+
+        const loginWithTwoFactor = () => {
+            const twoFactorToken = _$.twoFactorInput.val().trim()
+
+            this.app.emit('user:loginTwoFactor.attempt', {
+                twoFactorToken,
+            })
         }
 
 
@@ -61,10 +71,30 @@ class UserModule {
             }
         })
 
-
         // Login with the button.
         _$.loginButton.on('click', (e) => {
             login()
+        })
+
+        $('.login--two-factor-form').submit((e) => {
+            e.preventDefault();
+            loginWithTwoFactor()
+        })
+
+        // Handle toggling the two factor button and logging in on enter.
+        $('.login--two-factor-form :input').keyup((e) => {
+            // Toggle disabling/enabling of the login button based on the
+            // validity of the input elements.
+            if (_$.twoFactorInput.val().trim().length) {
+                _$.twoFactorButton.prop('disabled', false)
+            } else {
+                _$.twoFactorButton.prop('disabled', true)
+            }
+        })
+
+        _$.twoFactorButton.on('click', (e) => {
+            e.preventDefault()
+            loginWithTwoFactor()
         })
 
         // Change the stored username/emailaddress on typing, so
@@ -96,10 +126,25 @@ class UserModule {
         })
 
         /**
-        * Show an error on login fail.
+        * Show an error on login fail in case a two factor token is needed.
         */
         this.app.on('user:login.twoFactorMandatory', (data) => {
             this.app.modules.ui.showTwoFactorView()
+            _$.twoFactorInput.focus()
+        })
+
+        /**
+        * Show an error on two factor login fail.
+        */
+        this.app.on('user:twoFactorLogin.failed', () => {
+            this.app.modules.ui.setButtonState(_$.twoFactorButton, 'error', true, 0)
+        })
+
+        /**
+        * Display an indicator when logging in.
+        */
+        this.app.on('user:loginTwoFactor.in_progress', (data) => {
+            this.app.modules.ui.setButtonState(_$.twoFactorButton, 'loading', true, 0)
         })
 
         /**

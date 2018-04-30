@@ -29,7 +29,7 @@ class UiModule {
         this._$.telemetryView = $('.telemetry-opt-in')
         this._$.loginView = $('.login-section')
 
-        if (this.app.store.get('user') && this.app.store.get('username') && this.app.store.get('password')) {
+        if (this.app.store.get('user') && this.app.store.get('username') && this.app.store.get('token')) {
             this._$.currentView = $('.view-app')
         } else {
             this._$.currentView = $('.view-login')
@@ -272,7 +272,7 @@ class UiModule {
     */
     showActiveView() {
         // Switch between logged-in and login state.
-        if (this.app.store.get('user') && this.app.store.get('username') && this.app.store.get('password')) {
+        if (this.app.store.get('user') && this.app.store.get('username') && this.app.store.get('token')) {
             this.app.emit('ui:ui.restore')
             $('#user-name').text(this.app.store.get('username'))
             this.showAppView()

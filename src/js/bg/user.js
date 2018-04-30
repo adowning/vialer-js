@@ -10,18 +10,28 @@ class UserModule {
 
 
     addListeners() {
-        this.app.on('user:login.attempt', ({username, email, password, twoFactorToken}) => {
+        this.app.on('user:login.attempt', ({username, email, password}) => {
             if (username) {
                 this.app.store.set('username', username)
             }
             if (password) {
                 this.app.store.set('password', password)
             }
-            if (twoFactorToken) {
-                this.app.store.set('twoFactorToken', twoFactorToken)
-            }
             this.app.emit('user:login.in_progress')
-            this.login(this.app.store.get('username'), this.app.store.get('password'), this.app.store.get('twoFactorToken'))
+            this.login({
+                password: this.app.store.get('password'),
+                username: this.app.store.get('username'),
+            })
+        })
+
+        this.app.on('user:loginTwoFactor.attempt', ({twoFactorToken}) => {
+            this.app.store.set('twoFactorToken', twoFactorToken)
+            this.app.emit('user:loginTwoFactor.in_progress')
+            this.login({
+                password: this.app.store.get('password'),
+                twoFactorToken: this.app.store.get('twoFactorToken'),
+                username: this.app.store.get('username'),
+            })
         })
 
         this.app.on('user:logout.attempt', () => {
@@ -30,7 +40,6 @@ class UserModule {
     }
 
     clearTemporaryData() {
-        this.app.store.remove('username')
         this.app.store.remove('password')
         this.app.store.remove('twoFactorToken')
     }
@@ -44,7 +53,7 @@ class UserModule {
     * @param {String} password - password to login with.
     * @param {String} twoFactorToken - two factor authentication
     */
-    login(username, password, twoFactorToken) {
+    login({username, password, twoFactorToken}) {
         const payload = {
             email: username,
             password,
@@ -55,8 +64,7 @@ class UserModule {
         }
 
         this.app.api.client.post('api/permission/apitoken/', payload)
-            .then(({status, data, data: {apitoken, api_token }}) => {
-
+            .then(({status, data, data: { apitoken, api_token }}) => {
                 // be aware that the response from api/permissions/apitoken is very confusing
                 // it returns an api_token property when successful
                 // it returns an apitoken object when input is invalid or needs more data
@@ -64,25 +72,35 @@ class UserModule {
                 const errors = apitoken;
 
                 if (this.app.api.NOTOK_STATUS.includes(status)) {
-                    if (errors.two_factor_token && errors.two_factor_token.length) {
-                        this.app.emit('user:login.twoFactorMandatory');
-                    } else {
+                    // when username or password didn't match their names are both in the errors object
+                    if (errors.username && errors.password) {
                         // Remove credentials from the store.
                         this.clearTemporaryData()
+                        this.app.emit('user:login.failed', {reason: status})
+                    } else if (errors.two_factor_token) {
+
+                        const [twoFactorErrorMessage] = errors.two_factor_token
+                        if (twoFactorErrorMessage.toLowerCase().includes('required')) {
+                            this.app.emit('user:login.twoFactorMandatory')
+                        } else {
+                            this.app.emit('user:twoFactorLogin.failed')
+                        }
+
+                    } else {
                         this.app.emit('user:login.failed', {reason: status})
                     }
                 } else if (this.app.api.OK_STATUS.includes(status)) {
                     if (token) {
-
                         this.app.store.set('token', `Token ${username}:${token}`)
-                        this.clearTemporaryData()
                     }
                 }
 
                 return this.app.api.client.get('api/permission/systemuser/profile/')
             })
             .then(({data, status}) => {
+                console.log(data, status)
                 if (this.app.api.OK_STATUS.includes(status)) {
+                    this.clearTemporaryData()
                     if (!data.client) {
                         this.logout()
                         return
@@ -108,6 +126,7 @@ class UserModule {
                 }
             })
             .catch( err => {
+                this.clearTemporaryData()
                 this.app.emit('user:login.failed', {reason: err})
             })
 
