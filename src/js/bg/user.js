@@ -128,39 +128,6 @@ class UserModule {
                 this.clearTemporaryData()
                 this.app.emit('user:login.failed', {reason: err})
             })
-
-        // this.app.api.setupClient(username, password, twoFactorToken)
-        // this.app.api.client.get('api/permission/systemuser/profile/').then((res) => {
-        //     if (this.app.api.OK_STATUS.includes(res.status)) {
-        //         let user = res.data
-        //         if (!user.client) {
-        //             this.logout()
-        //             return
-        //         }
-
-        //         // Parse and set the client id as a new property.
-        //         user.client_id = user.client.replace(/[^\d.]/g, '')
-        //         this.app.store.set('user', user)
-
-        //         // Perform some actions on login.
-        //         this.app.emit('user:login.success', {user: user}, 'both')
-        //         // Reset seen notifications.
-        //         let notificationsData = this.app.store.get('notifications')
-        //         if (!notificationsData) notificationsData = {}
-        //         notificationsData.unauthorized = false
-        //         this.app.store.set('notifications', notificationsData)
-        //         // Start loading the widgets.
-        //         this.app.modules.ui.refreshWidgets(false)
-        //         this.app.logger.info(`${this}login successful`)
-        //         // Connect to the sip service on succesful login.
-        //         this.app.sip.connect()
-        //     } else if (this.app.api.NOTOK_STATUS.includes(res.status)) {
-        //         // Remove credentials from the store.
-        //         this.app.store.remove('username')
-        //         this.app.store.remove('password')
-        //         this.app.emit('user:login.failed', {reason: res.status})
-        //     }
-        // })
     }
 
 
