@@ -76,13 +76,13 @@ class UserModule {
             login()
         })
 
-        $('.login--two-factor-form').submit((e) => {
+        $('.two-factor-form').submit((e) => {
             e.preventDefault();
             loginWithTwoFactor()
         })
 
         // Handle toggling the two factor button and logging in on enter.
-        $('.login--two-factor-form :input').keyup((e) => {
+        $('.two-factor-form :input').keyup((e) => {
             // Toggle disabling/enabling of the login button based on the
             // validity of the input elements.
             if (_$.twoFactorInput.val().trim().length) {

@@ -46,12 +46,12 @@ class UserModule {
 
 
     /**
-    * Make an api call with the current basic authentication to retrieve
-    * profile information with. Save the credentials in storage when the call
+    * Make an api call to retrieve a token and check if 2fa is needed, after which
+    * profile information is retreived. Save the credentials in storage when the call
     * is succesful, otherwise remove the credentials from the store.
     * @param {String} username - e-mail address to login with.
     * @param {String} password - password to login with.
-    * @param {String} twoFactorToken - two factor authentication
+    * @param {String} twoFactorToken - two factor authentication token
     */
     login({username, password, twoFactorToken}) {
         const payload = {
@@ -104,7 +104,7 @@ class UserModule {
                     }
                 }
             })
-            .then(({data, status}) => {
+            .then(({data, status} = {}) => {
                 if (this.app.api.OK_STATUS.includes(status)) {
                     this.clearTemporaryData()
                     if (!data.client) {
